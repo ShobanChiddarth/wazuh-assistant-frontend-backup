@@ -163,6 +163,7 @@ button {
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 24px;
   padding: 24px;
+  overflow-x: hidden;
 }
 
 .results-header {
@@ -179,12 +180,13 @@ button {
 
 .results-table-wrap {
   overflow-x: auto;
+  max-width: 100%;
 }
 
 .results-table {
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
-  min-width: 900px;
 }
 
 .results-table th,
