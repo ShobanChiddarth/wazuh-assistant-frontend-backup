@@ -4,19 +4,28 @@ A React frontend for the Wazuh Assistant user interface.
 
 ## Run locally
 
-1. Install dependencies:
+1. Environment variables:
+
+   ```bash
+   cp sample.env .env
+   nano .env # put backend URL
+   set -a
+   source .env
+   ```
+
+2. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Start the development server:
+3. Start the development server:
 
    ```bash
    npm start
    ```
 
-3. Open the app in your browser:
+4. Open the app in your browser:
 
    ```text
    http://localhost:3000
