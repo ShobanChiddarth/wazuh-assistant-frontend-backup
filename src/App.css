@@ -87,6 +87,7 @@ button {
 .sidebar-brand {
   font-size: 1.25rem;
   font-weight: 700;
+  cursor: pointer;
 }
 
 .sidebar-item {

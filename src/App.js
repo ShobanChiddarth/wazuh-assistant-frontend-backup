@@ -80,7 +80,7 @@ function App() {
   return (
     <div className="app-shell hub-screen">
       <aside className="sidebar">
-        <div className="sidebar-brand">Wazuh Assistant</div>
+        <div className="sidebar-brand" onClick={() => navigate('/')}>Wazuh Assistant</div>
         <nav>
           <button
             className={`sidebar-item ${activeView === 'playground' ? 'active' : ''}`}
