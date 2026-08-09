@@ -12,10 +12,17 @@ const normalizePath = (path) => path.replace(/\/+$|^(?=\/)/g, '') || '/';
 function App() {
   const [path, setPath] = useState(() => normalizePath(window.location.pathname));
   const [playgroundQueryText, setPlaygroundQueryText] = useState(JSON.stringify(initialQuery, null, 2));
+  const [playgroundResponseData, setPlaygroundResponseData] = useState(null);
+  const [playgroundError, setPlaygroundError] = useState(null);
+  const [playgroundLoading, setPlaygroundLoading] = useState(false);
+
+  const [chatPromptText, setChatPromptText] = useState('');
+  const [chatMessageText, setChatMessageText] = useState('');
   const [chatQueryText, setChatQueryText] = useState('');
-  const [responseData, setResponseData] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [chatHasGeneratedQuery, setChatHasGeneratedQuery] = useState(false);
+  const [chatResponseData, setChatResponseData] = useState(null);
+  const [chatError, setChatError] = useState(null);
+  const [chatLoading, setChatLoading] = useState(false);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -46,27 +53,51 @@ function App() {
     setPath(normalized);
   };
 
-  const executeQuery = async (rawQueryText) => {
-    setError(null);
-    setResponseData(null);
+  const executePlaygroundQuery = async (rawQueryText) => {
+    setPlaygroundError(null);
+    setPlaygroundResponseData(null);
     let body;
 
     try {
       body = JSON.parse(rawQueryText);
     } catch (err) {
-      setError('Invalid JSON in query editor. Please fix the syntax and try again.');
+      setPlaygroundError('Invalid JSON in query editor. Please fix the syntax and try again.');
       return;
     }
 
-    setLoading(true);
+    setPlaygroundLoading(true);
 
     try {
       const data = await executeIndexerProxy(body);
-      setResponseData(data);
+      setPlaygroundResponseData(data);
     } catch (err) {
-      setError(err.message || 'Unable to fetch data from backend.');
+      setPlaygroundError(err.message || 'Unable to fetch data from backend.');
     } finally {
-      setLoading(false);
+      setPlaygroundLoading(false);
+    }
+  };
+
+  const executeChatQuery = async (rawQueryText) => {
+    setChatError(null);
+    setChatResponseData(null);
+    let body;
+
+    try {
+      body = JSON.parse(rawQueryText);
+    } catch (err) {
+      setChatError('Invalid JSON in query editor. Please fix the syntax and try again.');
+      return;
+    }
+
+    setChatLoading(true);
+
+    try {
+      const data = await executeIndexerProxy(body);
+      setChatResponseData(data);
+    } catch (err) {
+      setChatError(err.message || 'Unable to fetch data from backend.');
+    } finally {
+      setChatLoading(false);
     }
   };
 
@@ -102,22 +133,28 @@ function App() {
             <PlaygroundPanel
               queryText={playgroundQueryText}
               onQueryChange={setPlaygroundQueryText}
-              onExecute={() => executeQuery(playgroundQueryText)}
-              loading={loading}
-              error={error}
+              onExecute={() => executePlaygroundQuery(playgroundQueryText)}
+              loading={playgroundLoading}
+              error={playgroundError}
             />
-            <ResultsTable responseData={responseData} />
+            <ResultsTable responseData={playgroundResponseData} />
           </>
         ) : (
           <ChatView
+            promptText={chatPromptText}
+            setPromptText={setChatPromptText}
+            messageText={chatMessageText}
+            setMessageText={setChatMessageText}
             queryText={chatQueryText}
             setQueryText={setChatQueryText}
-            onExecute={() => executeQuery(chatQueryText)}
-            responseData={responseData}
-            setResponseData={setResponseData}
-            error={error}
-            setError={setError}
-            loading={loading}
+            hasGeneratedQuery={chatHasGeneratedQuery}
+            setHasGeneratedQuery={setChatHasGeneratedQuery}
+            onExecute={() => executeChatQuery(chatQueryText)}
+            responseData={chatResponseData}
+            setResponseData={setChatResponseData}
+            error={chatError}
+            setError={setChatError}
+            loading={chatLoading}
           />
         )}
       </main>

@@ -3,8 +3,14 @@ import { generateQueryPrompt } from '../utils/generateQuery';
 import ResultsTable from './ResultsTable';
 
 export default function ChatView({
+  promptText,
+  setPromptText,
+  messageText,
+  setMessageText,
   queryText,
   setQueryText,
+  hasGeneratedQuery,
+  setHasGeneratedQuery,
   onExecute,
   responseData,
   setResponseData,
@@ -12,9 +18,6 @@ export default function ChatView({
   setError,
   loading
 }) {
-  const [promptText, setPromptText] = useState('');
-  const [messageText, setMessageText] = useState('');
-  const [hasGeneratedQuery, setHasGeneratedQuery] = useState(false);
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
 
