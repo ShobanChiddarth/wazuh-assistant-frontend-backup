@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import HomeScreen from './components/HomeScreen';
 import PlaygroundPanel from './components/PlaygroundPanel';
+import ChatView from './components/ChatView';
 import ResultsTable from './components/ResultsTable';
 import { initialQuery } from './constants/initialQuery';
 import { executeIndexerProxy } from './utils/indexerApi';
@@ -10,7 +11,8 @@ const normalizePath = (path) => path.replace(/\/+$|^(?=\/)/g, '') || '/';
 
 function App() {
   const [path, setPath] = useState(() => normalizePath(window.location.pathname));
-  const [queryText, setQueryText] = useState(JSON.stringify(initialQuery, null, 2));
+  const [playgroundQueryText, setPlaygroundQueryText] = useState(JSON.stringify(initialQuery, null, 2));
+  const [chatQueryText, setChatQueryText] = useState('');
   const [responseData, setResponseData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -44,13 +46,13 @@ function App() {
     setPath(normalized);
   };
 
-  const executeQuery = async () => {
+  const executeQuery = async (rawQueryText) => {
     setError(null);
     setResponseData(null);
     let body;
 
     try {
-      body = JSON.parse(queryText);
+      body = JSON.parse(rawQueryText);
     } catch (err) {
       setError('Invalid JSON in query editor. Please fix the syntax and try again.');
       return;
@@ -98,23 +100,25 @@ function App() {
         {activeView === 'playground' ? (
           <>
             <PlaygroundPanel
-              queryText={queryText}
-              onQueryChange={setQueryText}
-              onExecute={executeQuery}
+              queryText={playgroundQueryText}
+              onQueryChange={setPlaygroundQueryText}
+              onExecute={() => executeQuery(playgroundQueryText)}
               loading={loading}
               error={error}
             />
             <ResultsTable responseData={responseData} />
           </>
         ) : (
-          <div className="editor-panel">
-            <div className="panel-header">
-              <div>
-                <h2>Chat</h2>
-                <p>Chat view will be available here.</p>
-              </div>
-            </div>
-          </div>
+          <ChatView
+            queryText={chatQueryText}
+            setQueryText={setChatQueryText}
+            onExecute={() => executeQuery(chatQueryText)}
+            responseData={responseData}
+            setResponseData={setResponseData}
+            error={error}
+            setError={setError}
+            loading={loading}
+          />
         )}
       </main>
     </div>
